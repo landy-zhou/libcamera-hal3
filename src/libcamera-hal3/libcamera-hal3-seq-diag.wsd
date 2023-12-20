@@ -1,0 +1,73 @@
+@startuml
+autonumber
+participant "Application"
+participant "CameraManager" as CM
+participant "Camera" as camera1
+participant "HAL3" as HAL3
+
+
+activate "Application"
+"Application" -> CM: start()
+activate CM
+CM -> CM: getCamera("cameraId")
+activate CM
+CM --> CM: return camera
+deactivate CM
+
+"Application" -> camera1: acquire()
+activate camera1
+camera1 -> HAL3: open()
+activate HAL3
+HAL3 --> camera1: return device
+deactivate HAL3
+camera1 --> "Application": return status
+deactivate camera1
+
+"Application" -> camera1: configure(config)
+activate camera1
+camera1 -> HAL3: configure_streams()
+activate HAL3
+HAL3 --> camera1: return result
+deactivate HAL3
+camera1 --> "Application": return status
+deactivate camera1
+
+"Application" -> camera1: start()
+activate camera1
+camera1 -> HAL3: process_capture_request()
+activate HAL3
+HAL3 --> camera1: return result
+deactivate HAL3
+camera1 --> "Application": return status
+deactivate camera1
+
+"Application" -> "Application": // Actions with the Camera, e.g., take photos, record video
+activate "Application"
+"Application" --> "Application": // Perform the actions
+deactivate "Application"
+
+"Application" -> camera1: stop()
+activate camera1
+camera1 -> HAL3: flush()
+activate HAL3
+HAL3 --> camera1: return status
+deactivate HAL3
+camera1 --> "Application": return status
+deactivate camera1
+
+"Application" -> camera1: release()
+activate camera1
+camera1 -> HAL3: close()
+activate HAL3
+HAL3 --> camera1: return status
+deactivate HAL3
+camera1 --> "Application": return status
+deactivate camera1
+
+"Application" -> CM: stop()
+activate CM
+CM --> "Application": return status
+deactivate CM
+
+deactivate "Application"
+@enduml
